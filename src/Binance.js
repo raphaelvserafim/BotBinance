@@ -16,7 +16,6 @@ const binance = new Binance().options({
 
 class Bot211Binance {
 
-
 	static async start() {
 
 		dados.saldo_cripto.forEach(async e => {
@@ -63,6 +62,7 @@ class Bot211Binance {
 				});
 
 				dados.saldo_BRL = parseFloat(parseFloat(dados.saldo_BRL) + parseFloat(response.cummulativeQuoteQty));
+
 				for (const e of dados.saldo_cripto) {
 					if (e.cripto == cripto) {
 						e.qtd = parseFloat((e.qtd - quantity));
@@ -98,8 +98,6 @@ class Bot211Binance {
 					var variacao = array[array.length - x][0];
 					var cripto = array[array.length - x][1];
 
-					console.log(cripto, variacao);
-
 					var confere = dados.saldo_cripto.find(c => c.cripto == cripto);
 
 					if (confere == undefined) {
@@ -112,6 +110,9 @@ class Bot211Binance {
 
 					} else {
 						if (confere.qtd == 0) {
+							var book = await binance.bookTickers(cripto);
+							var valor_atual = book.bidPrice;
+							var quantity = (parseFloat(dados.saldo_BRL) / parseFloat(valor_atual));
 							Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
 							stop = 1;
 						}
@@ -127,8 +128,6 @@ class Bot211Binance {
 	}
 
 	static async comprar(cripto, valor, quantity, valor_atual) {
-
-
 
 
 		console.log(cripto, `valor total: ${valor} quantity: ${Number((quantity).toFixed(2))} valor autal: ${valor_atual}`)
