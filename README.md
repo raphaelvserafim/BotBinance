@@ -32,3 +32,9 @@ npm i robo-211-binance
     
     // APAGAR OS COMENTARIOS !
   ```
+  
+  ### Start 
+  
+  ```JS
+  pm2 start index.js
+ ``` 
