@@ -1,11 +1,12 @@
 {
-  "name": "211binance",
+  "name": "robo-211-binance",
   "version": "1.0.0",
   "description": "Bot que opera na Binance",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "git@github.com:raphaelvserafim/Bot211Binance.git",
   "author": "Raphael Serafim <raphaelvserafim@gmail.com>",
   "license": "MIT",
   "dependencies": {
