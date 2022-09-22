@@ -18,28 +18,34 @@ class Bot211Binance {
 
 	static async start() {
 
-		dados.saldo_cripto.forEach(async e => {
+		if (dados.saldo_cripto.length > 0) {
+			
+		
+			dados.saldo_cripto.forEach(async e => {
 
-			if (e.qtd > 0) {
-				var porcenategem_venda = e.margem;
-				var book = await binance.bookTickers(e.cripto);
+				if (e.qtd > 0) { 	// moedas que tenho saldo 
 
-				var valor_atual = parseFloat(book.askPrice);
-				let valor_prev_venda = ((porcenategem_venda * e.valor_compra) / 100);
-				valor_prev_venda = (valor_prev_venda + e.valor_compra);
-				var valor_diff = (valor_atual - valor_prev_venda);
+					var porcenategem_venda = e.margem;
 
-				console.log('------------\n');
-				console.log(`valor desejado ${e.cripto}:`, valor_prev_venda)
-				console.log(`valor atual ${e.cripto}:`, valor_atual)
-				console.log(`valor diff ${e.cripto}:`, valor_diff)
-				console.log('\n------------\n');
+					var book = await binance.bookTickers(e.cripto); // consultar o preço atual 
 
-				if (valor_diff > 0) {
-					Bot211Binance.vender(e.cripto, e.qtd, valor_atual);
+					var valor_atual = parseFloat(book.askPrice); // valor de venda
+					let valor_prev_venda = ((porcenategem_venda * e.valor_compra) / 100);
+					valor_prev_venda = (valor_prev_venda + e.valor_compra);
+					var valor_diff = (valor_atual - valor_prev_venda);
+
+					console.log('------------\n');
+					console.log(`valor desejado ${e.cripto}:`, valor_prev_venda)
+					console.log(`valor atual ${e.cripto}:`, valor_atual)
+					console.log(`valor diff ${e.cripto}:`, valor_diff)
+					console.log('\n------------\n');
+
+					if (valor_diff > 0) { // iniciar a venda 
+						Bot211Binance.vender(e.cripto, e.qtd, valor_atual);
+					}
 				}
-			}
-		});
+			});
+		}
 
 
 		await Bot211Binance.verredura();
@@ -49,7 +55,8 @@ class Bot211Binance {
 
 	static async vender(cripto, quantity, valor) {
 
-		binance.marketSell(cripto, quantity, (error, response) => {
+		// realizando a venda pelo valor de mercado 
+		binance.marketSell(cripto, quantity, (error, response) => { 
 			if (error) {
 				logserro.push(JSON.parse(error.body));
 				fs.writeFile('error.json', JSON.stringify(logserro, null, 2), err => {
@@ -69,6 +76,7 @@ class Bot211Binance {
 						e.valor_venda = parseFloat(valor);
 					}
 				}
+
 				fs.writeFile('dados.json', JSON.stringify(dados, null, 2), err => {
 					if (err) throw err;
 				});
@@ -79,34 +87,40 @@ class Bot211Binance {
 
 	static async verredura() {
 
-		if (dados.saldo_BRL > 50) {
+	
+		if (dados.saldo_BRL > process.env.SALDO_MINIMO) {
 
+			// buscando todas as moedas e variação de preço em 24 horas
 			binance.prevDay(false, async (error, prevDay) => {
+
 				let array = [];
 				for (let obj of prevDay) {
-					if (obj.symbol.indexOf(process.env.MOEDA) != -1) {
-						if (0 > parseFloat(obj.priceChangePercent)) {
+					if (obj.symbol.indexOf(process.env.MOEDA) != -1) {  
+						if (0 > parseFloat(obj.priceChangePercent)) { // pegando apenas as variação negativa 
 							array.push([parseFloat(obj.priceChangePercent), obj.symbol]);
 						}
 					}
 				}
 				array.sort();
-				let stop = 0; 
+				let stop = 0;
 				let x = 1;
-				console.log(array);
+			
 				while (stop == 0) {
 					var variacao = array[array.length - x][0];
 					var cripto = array[array.length - x][1];
 
+					console.log(cripto, variacao);
+
 					var confere = dados.saldo_cripto.find(c => c.cripto == cripto);
 
 					if (confere == undefined) {
-						var book = await binance.bookTickers(cripto);
+
+						var book = await binance.bookTickers(cripto); // buscando o valor de mercado 
 						var valor_atual = book.bidPrice;
 						var quantity = (parseFloat(dados.saldo_BRL) / parseFloat(valor_atual));
 
 						Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
-						stop = 1; 
+						stop = 1;
 					} else {
 						if (confere.qtd == 0) {
 							var book = await binance.bookTickers(cripto);
