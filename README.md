@@ -13,6 +13,7 @@ Se cadastrar na <a href="https://www.binance.com/pt-BR/activity/referral-entry/C
 ## Instalando via npm  
 
 ```
+npm i robo-211-binance
 ```
 
 ### EXEMPLOS
