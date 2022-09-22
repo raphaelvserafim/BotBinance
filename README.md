@@ -20,11 +20,15 @@ npm i robo-211-binance
 #### Caso já tenha saldo em criptos adicionar no arquivo dados.json 
 
 ```JSON
- {
+  "saldo_cripto": [
+    {
       "margem": 5, // a porcentagem da venda
       "cripto": "DOGEBRL", // codigo da moeda
       "qtd": 2380, // unidades
       "valor_compra": 0.3095, // o valor da compra da unidade
       "valor_venda": 0
     }
+    ]
+    
+    // APAGAR OS COMENTARIOS !
   ```
