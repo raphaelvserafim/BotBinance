@@ -91,7 +91,7 @@ class Bot211Binance {
 					}
 				}
 				array.sort();
-				let stop = 0;
+				let stop = 0; 
 				let x = 1;
 				console.log(array);
 				while (stop == 0) {
@@ -106,8 +106,7 @@ class Bot211Binance {
 						var quantity = (parseFloat(dados.saldo_BRL) / parseFloat(valor_atual));
 
 						Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
-						stop = 1;
-
+						stop = 1; 
 					} else {
 						if (confere.qtd == 0) {
 							var book = await binance.bookTickers(cripto);
