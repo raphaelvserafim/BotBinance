@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "git@github.com:raphaelvserafim/Bot211Binance.git",
+  "repository": "git@github.com:raphaelvserafim/BotBinance.git",
   "author": "Raphael Serafim <raphaelvserafim@gmail.com>",
   "license": "MIT",
   "dependencies": {
