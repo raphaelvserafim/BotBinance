@@ -1,0 +1,16 @@
+{
+  "name": "211binance",
+  "version": "1.0.0",
+  "description": "Bot que opera na Binance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Raphael Serafim <raphaelvserafim@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.2",
+    "node-binance-api": "^0.13.1",
+    "node-cron": "^3.0.2"
+  }
+}
