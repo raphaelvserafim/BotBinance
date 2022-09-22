@@ -30,7 +30,6 @@ class Bot211Binance {
 				valor_prev_venda = (valor_prev_venda + e.valor_compra);
 				var valor_diff = (valor_atual - valor_prev_venda);
 
-				// console.log(e.cripto, valor_atual);
 				console.log('------------\n');
 				console.log(`valor desejado ${e.cripto}:`, valor_prev_venda)
 				console.log(`valor atual ${e.cripto}:`, valor_atual)
@@ -80,96 +79,92 @@ class Bot211Binance {
 
 	static async verredura() {
 
-		//if (dados.saldo_BRL > 30) {
+		if (dados.saldo_BRL > 50) {
 
-		binance.prevDay(false, async (error, prevDay) => {
-			let array = [];
-			for (let obj of prevDay) {
-				if (obj.symbol.indexOf(process.env.MOEDA) != -1) {
-					if (0 > parseFloat(obj.priceChangePercent)) {
-						array.push([parseFloat(obj.priceChangePercent), obj.symbol]);
+			binance.prevDay(false, async (error, prevDay) => {
+				let array = [];
+				for (let obj of prevDay) {
+					if (obj.symbol.indexOf(process.env.MOEDA) != -1) {
+						if (0 > parseFloat(obj.priceChangePercent)) {
+							array.push([parseFloat(obj.priceChangePercent), obj.symbol]);
+						}
 					}
 				}
-			}
-			array.sort();
-			let stop = 0;
-			let x = 1;
-			console.log(array);
-			while (stop == 0) {
-				var variacao = array[array.length - x][0];
-				var cripto = array[array.length - x][1];
+				array.sort();
+				let stop = 0;
+				let x = 1;
+				console.log(array);
+				while (stop == 0) {
+					var variacao = array[array.length - x][0];
+					var cripto = array[array.length - x][1];
 
-				console.log(cripto, variacao);
+					console.log(cripto, variacao);
 
-				var confere = dados.saldo_cripto.find(c => c.cripto == cripto);
+					var confere = dados.saldo_cripto.find(c => c.cripto == cripto);
 
-				if (confere == undefined) {
-					var book = await binance.bookTickers(cripto);
-					var valor_atual = book.bidPrice;
-					var quantity = (parseFloat(dados.saldo_BRL) / parseFloat(valor_atual));
+					if (confere == undefined) {
+						var book = await binance.bookTickers(cripto);
+						var valor_atual = book.bidPrice;
+						var quantity = (parseFloat(dados.saldo_BRL) / parseFloat(valor_atual));
 
-					Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
-					stop = 1;
-
-				} else {
-					if (confere.qtd == 0) {
 						Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
 						stop = 1;
+
+					} else {
+						if (confere.qtd == 0) {
+							Bot211Binance.comprar(cripto, dados.saldo_BRL, quantity, valor_atual);
+							stop = 1;
+						}
 					}
+
+					x++;
+
 				}
-
-				x++;
-
-			}
-		});
-
-		//}
-
-	}
-
-	static async comprar(cripto, valor, quantity, valor_atual) {
-		if (dados.saldo_BRL > 100) {
-
-
-
-			console.log(cripto, `valor total: ${valor} quantity: ${Number((quantity).toFixed(2))} valor autal: ${valor_atual}`)
-
-			binance.marketBuy(cripto, Number((quantity).toFixed(2)), (error, response) => {
-				if (error) {
-					logserro.push(JSON.parse(error.body));
-					fs.writeFile('error.json', JSON.stringify(logserro, null, 2), err => {
-						if (err) throw err;
-					});
-
-					console.log(error.body);
-
-				} else {
-					trades.push(response);
-					fs.writeFile('trade.json', JSON.stringify(trades, null, 2), err => {
-						if (err) throw err;
-					});
-					console.log(response);
-
-					dados.saldo_BRL = parseFloat(parseFloat(dados.saldo_BRL) - parseFloat(response.cummulativeQuoteQty));
-
-					dados.saldo_cripto.push({
-						"margem": 5,
-						"cripto": cripto,
-						"qtd": quantity,
-						"valor_compra": parseFloat(valor_atual),
-						"valor_venda": 0
-					});
-
-					fs.writeFile('dados.json', JSON.stringify(dados, null, 2), err => {
-						if (err) throw err;
-					});
-				}
-
 			});
 
 		}
 
+	}
 
+	static async comprar(cripto, valor, quantity, valor_atual) {
+
+
+
+
+		console.log(cripto, `valor total: ${valor} quantity: ${Number((quantity).toFixed(2))} valor autal: ${valor_atual}`)
+
+		binance.marketBuy(cripto, Number((quantity).toFixed(2)), (error, response) => {
+			if (error) {
+				logserro.push(JSON.parse(error.body));
+				fs.writeFile('error.json', JSON.stringify(logserro, null, 2), err => {
+					if (err) throw err;
+				});
+
+				console.log(error.body);
+
+			} else {
+				trades.push(response);
+				fs.writeFile('trade.json', JSON.stringify(trades, null, 2), err => {
+					if (err) throw err;
+				});
+				console.log(response);
+
+				dados.saldo_BRL = parseFloat(parseFloat(dados.saldo_BRL) - parseFloat(response.cummulativeQuoteQty));
+
+				dados.saldo_cripto.push({
+					"margem": 5,
+					"cripto": cripto,
+					"qtd": quantity,
+					"valor_compra": parseFloat(valor_atual),
+					"valor_venda": 0
+				});
+
+				fs.writeFile('dados.json', JSON.stringify(dados, null, 2), err => {
+					if (err) throw err;
+				});
+			}
+
+		})
 
 	}
 
